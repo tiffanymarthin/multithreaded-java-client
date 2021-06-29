@@ -1,0 +1,41 @@
+ Building Scalable
+Distributed Systems
+
+  Ian Gorton
+
+   Copyright  2021 Ian Gorton
+   All rights reserved.
+   ISBN:
+
+DEDICATION
+
+   Insert dedication text here. Insert dedication text here. Insert dedication text here. Insert
+dedication text here. Insert dedication text here. Insert dedication text here. Insert dedication
+text here. Insert dedication text here. Insert dedication text here. Insert dedication text here.
+
+TABLE OF CONTENTS
+   Introduction to Scalable Systems	10
+   What is Scalability?	10
+   System scale in early 2020s: Examples	12
+   How did we get here? A short history of system growth	13
+   The 1980s	13
+   1990-1995	14
+   1996-2000	14
+   2000-2006	14
+   2007-2020 (today)	15
+   Scalability Basic Design Principles	15
+   Scalability and Costs	17
+   Summary	19
+   References	19
+   Distributed Systems Architectures: A Whirlwind Tour	20
+   Basic System Architecture	20
+   Scale Out	22
+   Scaling the Database with Caching	23
+   Distributing the Database	25
+   Multiple Processing Tiers	26
+   Increasing Responsiveness	28
+   Summary and Further Reading	30
+   An Overview of Concurrent Systems	31
+   Why Concurrency?	31
+   Threads in Java	33
+   Order of Thread Execution	35
