@@ -1,6 +1,8 @@
 package neu.cs6650.client;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import neu.cs6650.Configuration;
@@ -14,10 +16,8 @@ public class Main {
 //  private static final String INPUT_PATH = "test.txt";
 //  private static final String INPUT_PATH = "bsds-summer-2021-testdata.txt";
   private static final String INPUT_PATH = "bsds-summer-2021-testdata-assignment2.txt";
-  private static String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/sample.csv";
   private static final String POISON_PILL = "-1";
-  private static final String AWS_API_ROUTE = "34.215.200.33";
-  private static String AWS_LB = "a2-loadbalancer-server-e39e39be22214364.elb.us-west-2.amazonaws.com";
+  private static String AWS_API_ROUTE;
 
   public static void main(String[] args) throws IOException, InterruptedException {
     // Create a BlockingQ
@@ -27,13 +27,23 @@ public class Main {
     // Write to CSV
     // Process Statistics
 
-    String ipAddress = Configuration.IS_LOCAL ? "localhost" : (Configuration.IS_LB ? AWS_LB : AWS_API_ROUTE);
+    Properties prop = new Properties();
+    try (InputStream input = Thread.currentThread().getContextClassLoader()
+        .getResourceAsStream("config.properties")) {
+      prop.load(input);
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+
+    AWS_API_ROUTE = prop.getProperty("aws.aws_api_address");
+
+    String ipAddress = Configuration.IS_LOCAL ? "localhost" : AWS_API_ROUTE;
     String port = "8080";
     String function = "wordcount";
-
+    String outputPath = "/Users/tmarthin/Code/tiffanymarthin/distributed-systems/assignment1/multithreaded-client-p2/output/sample.csv";
     int maxThread = 64;
+
     BlockingQueue<String> blockingQueue = new LinkedBlockingQueue<>();
-//    BlockingQueue<String> blockingQueue = new ArrayBlockingQueue<>(1000);
 
     long startTime, endTime;
 
@@ -41,7 +51,6 @@ public class Main {
     //TODO validates the inputs
     if (args.length != 0) {
       outputPath = args[0];
-//      System.out.println(outputPath);
       ipAddress = args[1];
       maxThread = Integer.parseInt(args[2]);
     }

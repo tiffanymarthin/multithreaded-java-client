@@ -38,7 +38,7 @@ public class PostCallable implements Callable<ThreadRecord> {
 
 
   private final OkHttpClient client = new OkHttpClient.Builder()
-      .connectTimeout(40, TimeUnit.SECONDS)
+      .connectTimeout(5, TimeUnit.SECONDS)
       .readTimeout(5, TimeUnit.SECONDS)
       .build();
 

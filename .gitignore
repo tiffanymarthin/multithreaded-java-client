@@ -75,4 +75,7 @@ modules.xml
 # DS Store
 *.DS_Store
 
+# Config file
+**/config.properties
+
 # End of https://www.gitignore.io/api/intellij+all
