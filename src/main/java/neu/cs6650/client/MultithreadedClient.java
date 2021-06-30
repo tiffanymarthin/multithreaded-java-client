@@ -18,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class MultithreadedClient {
+
   private static final Logger logger = LogManager.getLogger(PostCallable.class.getName());
 
   private Integer maxThreads;
@@ -28,15 +29,19 @@ public class MultithreadedClient {
   private String function;
   private String poisonPill;
 
-  private long totalSuccessfulRequests;
-  private long totalFailedRequests;
-  private List<LatencyRecord> latencyList = new ArrayList<>();
+  private long totalSuccessfulPostRequests;
+  private long totalFailedPostRequests;
+  private long totalSuccessfulGetRequests;
+  private long totalFailedGetRequests;
+  private List<LatencyRecord> postReqLatencyList = new ArrayList<>();
+  private List<LatencyRecord> getReqLatencyList = new ArrayList<>();
 
   private ExecutorService executor;
-  private CompletionService<ThreadRecord> completionService;
+  private CompletionService<ThreadRecord> postCompletionService, getCompletionService;
 
   public MultithreadedClient(Integer maxThreads,
-      BlockingQueue<String> textInput, String ipAddress, String port, String function, String poisonPill) {
+      BlockingQueue<String> textInput, String ipAddress, String port, String function,
+      String poisonPill) {
     this.maxThreads = maxThreads;
     this.lineQueue = textInput;
     this.ipAddress = ipAddress;
@@ -44,7 +49,8 @@ public class MultithreadedClient {
     this.function = function;
     this.poisonPill = poisonPill;
     this.executor = Executors.newFixedThreadPool(maxThreads);
-    this.completionService = new ExecutorCompletionService<>(this.executor);
+    this.postCompletionService = new ExecutorCompletionService<>(this.executor);
+    this.getCompletionService = new ExecutorCompletionService<>(this.executor);
   }
 
   public void start() throws InterruptedException {
@@ -57,20 +63,27 @@ public class MultithreadedClient {
     ThreadInput threadInput = new ThreadInput(this.ipAddress, this.port);
     for (int i = 0; i < maxThreads; i++) {
       PostCallable postCallable = new PostCallable(lineQueue, threadInput, function, poisonPill);
-      completionService.submit(postCallable);
+      postCompletionService.submit(postCallable);
     }
+    GetCallable getCallable = new GetCallable(threadInput, function);
+    getCompletionService.submit(getCallable);
   }
 
   private void updateRequestResults() {
     try {
       for (int i = 0; i < maxThreads; i++) {
-        Future<ThreadRecord> f = completionService.take();
+        Future<ThreadRecord> f = postCompletionService.take();
         ThreadRecord record = f.get();
 //        System.out.println("future get: " + Thread.currentThread().getId());
-        this.totalSuccessfulRequests += record.getNSuccessRequest();
-        this.totalFailedRequests += record.getNFailedRequest();
-        latencyList.addAll(record.getLatencyList());
+        this.totalSuccessfulPostRequests += record.getNSuccessRequest();
+        this.totalFailedPostRequests += record.getNFailedRequest();
+        postReqLatencyList.addAll(record.getLatencyList());
       }
+      Future<ThreadRecord> getReqFuture = getCompletionService.take();
+      ThreadRecord getReqRecord = getReqFuture.get();
+      this.totalSuccessfulGetRequests += getReqRecord.getNSuccessRequest();
+      this.totalFailedGetRequests += getReqRecord.getNFailedRequest();
+      getReqLatencyList.addAll(getReqRecord.getLatencyList());
     } catch (InterruptedException e) {
       logger.info("Thread interrupted");
       Thread.currentThread().interrupt();
@@ -96,16 +109,29 @@ public class MultithreadedClient {
     }
   }
 
-  public long getTotalSuccessfulRequests() {
-    return totalSuccessfulRequests;
+  public long getTotalSuccessfulPostRequests() {
+    return totalSuccessfulPostRequests;
   }
 
-  public long getTotalFailedRequests() {
-    return totalFailedRequests;
+  public long getTotalFailedPostRequests() {
+    return totalFailedPostRequests;
   }
 
-  public List<LatencyRecord> getLatencyList() {
-    return latencyList;
+  public List<LatencyRecord> getPostLatencyList() {
+    return postReqLatencyList;
   }
+
+  public long getTotalSuccessfulGetRequests() {
+    return totalSuccessfulGetRequests;
+  }
+
+  public long getTotalFailedGetRequests() {
+    return totalFailedGetRequests;
+  }
+
+  public List<LatencyRecord> getGetReqLatencyList() {
+    return getReqLatencyList;
+  }
+
 }
 

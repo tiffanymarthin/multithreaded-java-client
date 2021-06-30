@@ -68,27 +68,33 @@ public class Main {
     client.start();
     endTime = System.currentTimeMillis();
     logger.info("*********** Client Ends ***********\n");
-
+    logger.info("*********** GET Requests Aggregate Statistics ***********");
+    logger.info("Number of successful GETs requests: " + client.getTotalSuccessfulGetRequests());
+    logger.info("Number of failed GETs requests: " + client.getTotalFailedGetRequests());
+    logger.info("Mean response time for GETs (milliseconds): " + Util.meanResponseTime(client.getGetReqLatencyList()));
+    logger.info("Max response time for GETs (milliseconds): " + Util.maxResponseTime(client.getGetReqLatencyList()));
+    logger.info("\n");
     logger.info("*********** Processing Statistics ***********");
 //    logger.info("Input processing run time: " + (inputProcessor.getEndTime() - inputProcessor.getStartTime()));
-    logger.info("Number of successful requests: " + client.getTotalSuccessfulRequests());
-    logger.info("Number of failed requests: " + client.getTotalFailedRequests());
+    logger.info("Number of successful POSTs requests: " + client.getTotalSuccessfulPostRequests());
+    logger.info("Number of failed POSTs requests: " + client.getTotalFailedPostRequests());
     logger.info("Client run time: " + (endTime - startTime) + " milliseconds");
 //    logger.info("Throughput (requests/second): " + ((client.getTotalSuccessfulRequests() + client.getTotalFailedRequests()) * 1000 / (endTime - startTime)));
-    logger.info("Throughput (requests/second): " + (Util.requestsPerSecond((client.getTotalSuccessfulRequests() + client.getTotalFailedRequests()), (endTime - startTime))) + "\n");
+    logger.info("Throughput (requests/second): " + (Util.requestsPerSecond((client.getTotalSuccessfulPostRequests() + client.getTotalFailedPostRequests()), (endTime - startTime))) + "\n");
 
 //    logger.info("*********** Write CSV Output for Latency Records ***********");
-    ReportWriter reportWriter = new ReportWriter(outputPath, client.getLatencyList());
+    ReportWriter reportWriter = new ReportWriter(outputPath, client.getPostLatencyList());
     reportWriter.start();
 //    logger.info("*********** CSV Writer Output for Latency Records ***********");
-
     logger.info("Num of cores: " + Runtime.getRuntime().availableProcessors());
+    logger.info("\n");
     logger.info("*********** Thread Aggregate Statistics ***********");
-    logger.info("Mean response time for POSTs (milliseconds): " + Util.meanResponseTime(client.getLatencyList()));
-    logger.info("Median response time for POSTs (milliseconds): " + Util.medianResponseTime(client.getLatencyList()));
-    logger.info("25th percentile response time for POSTs (milliseconds): " + Util.p25ResponseTime(client.getLatencyList()));
-    logger.info("75th percentile response time for POSTs (milliseconds): " + Util.p75ResponseTime(client.getLatencyList()));
-    logger.info("99th percentile response time for POSTs (milliseconds): " + Util.p99ResponseTime(client.getLatencyList()));
-    logger.info("Max response time for POSTs (milliseconds): " + Util.maxResponseTime(client.getLatencyList()));
+    logger.info("Mean response time for POSTs (milliseconds): " + Util.meanResponseTime(client.getPostLatencyList()));
+    logger.info("Median response time for POSTs (milliseconds): " + Util.medianResponseTime(client.getPostLatencyList()));
+    logger.info("25th percentile response time for POSTs (milliseconds): " + Util.p25ResponseTime(client.getPostLatencyList()));
+    logger.info("75th percentile response time for POSTs (milliseconds): " + Util.p75ResponseTime(client.getPostLatencyList()));
+    logger.info("99th percentile response time for POSTs (milliseconds): " + Util.p99ResponseTime(client.getPostLatencyList()));
+    logger.info("Max response time for POSTs (milliseconds): " + Util.maxResponseTime(client.getPostLatencyList()));
+    logger.info("\n");
   }
 }
